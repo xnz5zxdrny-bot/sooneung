@@ -55,21 +55,21 @@
       align-items: center;
       text-align: center;
       padding: 2rem;
-      /* 하단 도크(작업표시줄) 고려해서 화면 중앙보다 살짝 위로 올리기 */
-      transform: translateY(-7vh);
+      /* 작업표시줄(dock) 고려해서 화면 중앙보다 조금 더 위로 올림 */
+      transform: translateY(-10vh);
     }
 
     .title {
-      font-size: clamp(1.4rem, 3vw, 2rem);
-      letter-spacing: 0.12em;
+      font-size: clamp(1.7rem, 3.6vw, 2.4rem); /* 기존보다 약 20% 증가 */
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.8rem;
       opacity: 0.9;
     }
 
     .timer-wrapper {
-      padding: 1.5rem 2.5rem;
-      border-radius: 1.5rem;
+      padding: 1.8rem 3rem;
+      border-radius: 1.8rem;
       border: 1px solid rgba(230, 116, 81, 0.4);
       background: radial-gradient(circle at top, rgba(230, 116, 81, 0.15), transparent 60%);
       box-shadow:
@@ -78,22 +78,16 @@
         inset 0 0 15px rgba(0, 0, 0, 0.9);
     }
 
-    .label {
-      font-size: clamp(0.85rem, 1.4vw, 1rem);
-      margin-bottom: 0.5rem;
-      opacity: 0.8;
-    }
-
     .d-day {
-      font-size: clamp(0.9rem, 2vw, 1.2rem);
-      margin-bottom: 0.75rem;
-      opacity: 0.85;
+      font-size: clamp(1.1rem, 2.4vw, 1.5rem); /* 기존보다 약간 크게 */
+      margin-bottom: 0.9rem;
+      opacity: 0.9;
     }
 
     .countdown {
       font-family: "DSDIGII", "Courier New", monospace;
-      font-size: clamp(2.3rem, 9vw, 5rem);
-      letter-spacing: 0.12em;
+      font-size: clamp(2.8rem, 11vw, 6rem); /* 약 120%로 상향 */
+      letter-spacing: 0.16em;
       text-shadow:
         0 0 8px rgba(230, 116, 81, 0.7),
         0 0 18px rgba(230, 116, 81, 0.4),
@@ -101,16 +95,10 @@
       white-space: nowrap;
     }
 
-    .footer-info {
-      margin-top: 1.2rem;
-      font-size: 0.75rem;
-      opacity: 0.45;
-    }
-
     @media (max-width: 600px) {
       .timer-wrapper {
-        padding: 1.1rem 1.6rem;
-        border-radius: 1rem;
+        padding: 1.2rem 1.8rem;
+        border-radius: 1.2rem;
       }
     }
   </style>
@@ -120,15 +108,10 @@
     <div class="title">2027 수능</div>
 
     <div class="timer-wrapper">
-      <div class="label">대한민국 표준시 기준</div>
       <div id="d-day" class="d-day">D-</div>
       <div id="countdown" class="countdown">
-        --일 --시간 --분 --초
+        --일 00:00:00
       </div>
-    </div>
-
-    <div class="footer-info">
-      Target: 2026-11-19 00:00 (KST)
     </div>
   </div>
 
@@ -160,7 +143,8 @@
       const mStr = String(minutes).padStart(2, "0");
       const sStr = String(seconds).padStart(2, "0");
 
-      countdownEl.textContent = `${days}일 ${hStr}시간 ${mStr}분 ${sStr}초`;
+      // 형식: 363일 00:00:00
+      countdownEl.textContent = `${days}일 ${hStr}:${mStr}:${sStr}`;
 
       // D-표시 (오늘 0시 기준으로 계산, KST 기준)
       const dayMs = day;
@@ -184,7 +168,7 @@
 
       if (diff <= 0) {
         // 수능 시각이 지난 후 처리
-        countdownEl.textContent = "0일 00시간 00분 00초";
+        countdownEl.textContent = "0일 00:00:00";
         dDayEl.textContent = "시험이 종료되었습니다";
         return;
       }
