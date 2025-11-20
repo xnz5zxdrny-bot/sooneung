@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>2027 수능 D-Day 타이머</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!--
+    사용법
+    1. 이 파일(index.html)과 같은 폴더에 DS-DIGII.TTF 파일을 넣으세요.
+       (GitHub Pages에 올릴 때도 동일한 경로 유지)
+    2. GitHub Pages로 배포 후 URL을 Lively Wallpaper에 등록하면 됩니다.
+  -->
+  <style>
+    @font-face {
+      font-family: "DSDIGII";
+      src: url("DS-DIGII.TTF") format("truetype"); /* 파일 이름/확장자 주의 */
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --bg-color: #000000;      /* 애플 다크모드 느낌 검은색 */
+      --text-color: #e67451;    /* 요청한 색상 코드 */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      user-select: none;
+      /* Lively에서 마우스 커서를 안 보이게 하고 싶다면 아래 주석 해제
+      cursor: none;
+      */
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      /* 하단 도크(작업표시줄) 고려해서 화면 중앙보다 살짝 위로 올리기 */
+      transform: translateY(-7vh);
+    }
+
+    .title {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+
+    .timer-wrapper {
+      padding: 1.5rem 2.5rem;
+      border-radius: 1.5rem;
+      border: 1px solid rgba(230, 116, 81, 0.4);
+      background: radial-gradient(circle at top, rgba(230, 116, 81, 0.15), transparent 60%);
+      box-shadow:
+        0 0 25px rgba(0, 0, 0, 0.9),
+        0 0 40px rgba(230, 116, 81, 0.25),
+        inset 0 0 15px rgba(0, 0, 0, 0.9);
+    }
+
+    .label {
+      font-size: clamp(0.85rem, 1.4vw, 1rem);
+      margin-bottom: 0.5rem;
+      opacity: 0.8;
+    }
+
+    .d-day {
+      font-size: clamp(0.9rem, 2vw, 1.2rem);
+      margin-bottom: 0.75rem;
+      opacity: 0.85;
+    }
+
+    .countdown {
+      font-family: "DSDIGII", "Courier New", monospace;
+      font-size: clamp(2.3rem, 9vw, 5rem);
+      letter-spacing: 0.12em;
+      text-shadow:
+        0 0 8px rgba(230, 116, 81, 0.7),
+        0 0 18px rgba(230, 116, 81, 0.4),
+        0 0 35px rgba(230, 116, 81, 0.3);
+      white-space: nowrap;
+    }
+
+    .footer-info {
+      margin-top: 1.2rem;
+      font-size: 0.75rem;
+      opacity: 0.45;
+    }
+
+    @media (max-width: 600px) {
+      .timer-wrapper {
+        padding: 1.1rem 1.6rem;
+        border-radius: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">2027 수능</div>
+
+    <div class="timer-wrapper">
+      <div class="label">대한민국 표준시 기준</div>
+      <div id="d-day" class="d-day">D-</div>
+      <div id="countdown" class="countdown">
+        --일 --시간 --분 --초
+      </div>
+    </div>
+
+    <div class="footer-info">
+      Target: 2026-11-19 00:00 (KST)
+    </div>
+  </div>
+
+  <script>
+    // 2026년 11월 19일 00:00 KST (UTC+9 기준 고정)
+    const targetDate = new Date("2026-11-19T00:00:00+09:00").getTime();
+
+    const countdownEl = document.getElementById("countdown");
+    const dDayEl = document.getElementById("d-day");
+
+    function renderCountdown(diff) {
+      const second = 1000;
+      const minute = second * 60;
+      const hour = minute * 60;
+      const day = hour * 24;
+
+      const days = Math.floor(diff / day);
+      diff %= day;
+
+      const hours = Math.floor(diff / hour);
+      diff %= hour;
+
+      const minutes = Math.floor(diff / minute);
+      diff %= minute;
+
+      const seconds = Math.floor(diff / second);
+
+      const hStr = String(hours).padStart(2, "0");
+      const mStr = String(minutes).padStart(2, "0");
+      const sStr = String(seconds).padStart(2, "0");
+
+      countdownEl.textContent = `${days}일 ${hStr}시간 ${mStr}분 ${sStr}초`;
+
+      // D-표시 (오늘 0시 기준으로 계산, KST 기준)
+      const dayMs = day;
+      const now = new Date();
+      const nowKST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+      nowKST.setHours(0, 0, 0, 0);
+      const dayDiff = Math.ceil((targetDate - nowKST.getTime()) / dayMs);
+
+      if (dayDiff > 0) {
+        dDayEl.textContent = `D-${dayDiff}`;
+      } else if (dayDiff === 0) {
+        dDayEl.textContent = "D-DAY";
+      } else {
+        dDayEl.textContent = `D+${Math.abs(dayDiff)}`;
+      }
+    }
+
+    function updateCountdown() {
+      const now = Date.now();
+      const diff = targetDate - now;
+
+      if (diff <= 0) {
+        // 수능 시각이 지난 후 처리
+        countdownEl.textContent = "0일 00시간 00분 00초";
+        dDayEl.textContent = "시험이 종료되었습니다";
+        return;
+      }
+
+      renderCountdown(diff);
+    }
+
+    function startTicker() {
+      // 첫 렌더
+      updateCountdown();
+
+      // 현재 ms 위치를 기준으로 다음 정각 초에 맞추기
+      const now = Date.now();
+      const delay = 1000 - (now % 1000);
+
+      setTimeout(() => {
+        updateCountdown();
+        // 이후에는 정확히 1초 간격으로
+        setInterval(updateCountdown, 1000);
+      }, delay);
+    }
+
+    startTicker();
+  </script>
+</body>
+</html>
